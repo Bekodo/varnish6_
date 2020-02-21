@@ -1,0 +1,5 @@
+dict*
+deploy.sh
+__pycache__
+varnish4_
+*json

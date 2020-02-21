@@ -1,0 +1,43 @@
+#!/usr/bin/python3.6
+
+import json, sys
+import subprocess
+from aspects import varnish_aspects
+
+class Monitor(object):
+    stats_munin = varnish_aspects
+    varnish_stats = {}
+
+    def __init__(self):
+        varnishcommand=["varnishstat", "-j"]
+        json_stats = subprocess.run(varnishcommand, stdout=subprocess.PIPE)
+        self.varnish_stats = json.loads(json_stats.stdout)
+
+    def getValues(self,monitor):
+        for i in self.stats_munin[monitor]["values"].keys():
+            stats_key = "MAIN."+str(i)
+            print('{0}.value {1}'.format(i, self.varnish_stats[stats_key]['value']))
+
+    def getConfig(self,monitor):
+        print("graph_category Varnish")
+        print('graph_title {0}'.format(self.stats_munin[monitor]["title"]))
+        if "order" in self.stats_munin[monitor].keys():
+            print('graph_order {0}'.format(self.stats_munin[monitor]["order"]))
+        for i in self.stats_munin[monitor]["values"].keys():
+            stats_key = "MAIN."+str(i)
+            print('{0}.label {1}'.format(i, self.varnish_stats[stats_key]['description']))
+            for k in self.stats_munin[monitor]["values"][i].keys():
+                print('{0}.{1} {2}'.format(i,k,self.stats_munin[monitor]["values"][i][k]))
+
+if __name__ == '__main__':
+    element = sys.argv[0].split("varnish_")
+    if element[1]:
+        varnish = Monitor()
+        if len(sys.argv) < 2:
+            varnish.getValues(element[1])
+        elif sys.argv[1] == "config":
+            varnish.getConfig(element[1])
+        else:
+            print("Wrong Args")
+    else:
+        print('{0} suggest'.format(sys.argv[0]))
