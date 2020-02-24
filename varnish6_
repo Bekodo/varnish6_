@@ -32,7 +32,7 @@ class Monitor(object):
                 print('{0}.{1} {2}'.format(i,k,self.aspects_munin[monitor]["values"][i][k]))
 
     def getSuggest(self):
-        tomontor = ["backend_traffic","request_rate","transfer_rates","uptime","objects"]
+        tomontor = ["backend_traffic","request_rate","transfer_rates","uptime","objects","threads","expunge"]
         for i in tomontor:
             print(i)
 
