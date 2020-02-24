@@ -92,31 +92,29 @@ varnish_aspect = {
         'title': 'Memory usage',
         'args': '--base 1024',
         'values': {
-            'SMA_1': {
-                'family': 'SMA',
+            's0.g_bytes': {
+                'type': 'GAUGE',
                 'counter': 'g_bytes'
             },
-            'sms_nbytes': {
-                'type': 'GAUGE'
-            },
-            'SMF_1': {
-                'family': 'SMF',
+            'Transient.g_bytes': {
+                'type': 'GAUGE',
                 'counter': 'g_bytes'
             },
-            'SMA_2': {
-                'family': 'SMA',
+            's0.c_bytes': {
+                'type': 'GAUGE',
+                'counter': 'c_bytes'
+            },
+            'Transient.c_bytes': {
+                'type': 'GAUGE',
+                'counter': 'c_bytes'
+            },
+            's0.g_space': {
+                'type': 'GAUGE',
                 'counter': 'g_space'
             },
-            'sms_balloc': {
-                'type': 'GAUGE'
-            },
-            'SMF_2': {
-                'counter': 'g_space',
-                'family': 'SMF'
-            },
-            'SMA_3': {
-                'counter': 'c_bytes',
-                'family': 'SMA'
+            'Transient.g_space': {
+                'type': 'GAUGE',
+                'counter': 'g_space'
             }
         }
     },
