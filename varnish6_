@@ -33,8 +33,9 @@ class Monitor(object):
         for i in self.aspects_munin[monitor]["values"].keys():
             if (monitor == "memory_usage"):
                 stats_key = "SMA."+str(i)
-                name = i.replace('.' , '_', 1) 
-                print('{0}.label {1}'.format(name, self.varnish_stats[stats_key]['description']))
+                name = i.replace('.' , '_', 1)
+                label_name = name.split(".")
+                print('{0}.label {1} {2}'.format(name, self.varnish_stats[stats_key]['description'],label_name[0]))
             else:
                 stats_key = "MAIN."+str(i)
                 print('{0}.label {1}'.format(i, self.varnish_stats[stats_key]['description']))
