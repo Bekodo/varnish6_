@@ -44,7 +44,7 @@ if __name__ == '__main__':
             varnish.getValues(element[1])
         elif sys.argv[1] == "config":
             varnish.getConfig(element[1])
-        elif sys.argv[1] == "config":
+        elif sys.argv[1] == "suggest":
             varnish.getSuggest()
         else:
             print("Wrong Args")
