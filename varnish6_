@@ -5,7 +5,7 @@ import subprocess
 from aspects import varnish_aspects
 
 class Monitor(object):
-    stats_munin = varnish_aspects
+    aspects_munin = varnish_aspects
     varnish_stats = {}
 
     def __init__(self):
