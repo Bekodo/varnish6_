@@ -21,8 +21,10 @@ class Monitor(object):
     def getConfig(self,monitor):
         print("graph_category Varnish")
         print('graph_title {0}'.format(self.stats_munin[monitor]["title"]))
-        if "order" in self.stats_munin[monitor].keys():
-            print('graph_order {0}'.format(self.stats_munin[monitor]["order"]))
+        graph_param = ["order","scale","vlabel","args"]
+        for i in graph_param:
+            if i in self.stats_munin[monitor].keys():
+                print('graph_{0} {1}'.format(i, self.stats_munin[monitor][i]))
         for i in self.stats_munin[monitor]["values"].keys():
             stats_key = "MAIN."+str(i)
             print('{0}.label {1}'.format(i, self.varnish_stats[stats_key]['description']))
