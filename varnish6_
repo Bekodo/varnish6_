@@ -15,13 +15,8 @@ class Monitor(object):
 
     def getValues(self,monitor):
         for i in self.aspects_munin[monitor]["values"].keys():
-            if (monitor == "memory_usage"):
-                stats_key = "SMA."+str(i)
-                name = i.replace('.' , '_', 1) 
-                print('{0}.value {1}'.format(name, self.varnish_stats[stats_key]['value']))
-            else:
-                stats_key = "MAIN."+str(i)
-                print('{0}.value {1}'.format(i, self.varnish_stats[stats_key]['value']))
+            stats_key = "MAIN."+str(i)
+            print('{0}.value {1}'.format(i, self.varnish_stats[stats_key]['value']))
 
     def getConfig(self,monitor):
         print("graph_category Varnish")
@@ -31,23 +26,13 @@ class Monitor(object):
             if i in self.aspects_munin[monitor].keys():
                 print('graph_{0} {1}'.format(i, self.aspects_munin[monitor][i]))
         for i in self.aspects_munin[monitor]["values"].keys():
-            if (monitor == "memory_usage"):
-                stats_key = "SMA."+str(i)
-                name = i.replace('.' , '_', 1)
-                label_name = name.split(".")
-                print('{0}.label {1} {2}'.format(name, self.varnish_stats[stats_key]['description'],label_name[0]))
-            else:
-                stats_key = "MAIN."+str(i)
-                print('{0}.label {1}'.format(i, self.varnish_stats[stats_key]['description']))
-            for k in self.aspects_munin[monitor]["values"][i].keys():
-                if (monitor == "memory_usage"):
-                    name=i.replace('.' , '_', 1)
-                    print('{0}.{1} {2}'.format(name,k,self.aspects_munin[monitor]["values"][i][k]))
-                else:
-                    print('{0}.{1} {2}'.format(i,k,self.aspects_munin[monitor]["values"][i][k]))
-    
+            stats_key = "MAIN."+str(i)
+            print('{0}.label {1}'.format(i, self.varnish_stats[stats_key]['description']))
+        for k in self.aspects_munin[monitor]["values"][i].keys():
+                print('{0}.{1} {2}'.format(i,k,self.aspects_munin[monitor]["values"][i][k]))
+
     def getSuggest(self):
-        tomontor = ["backend_traffic","memory_usage","request_rate","transfer_rates","uptime"]
+        tomontor = ["backend_traffic","request_rate","transfer_rates","uptime","objects"]
         for i in tomontor:
             print(i)
 
