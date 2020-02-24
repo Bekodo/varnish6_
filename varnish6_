@@ -14,28 +14,36 @@ class Monitor(object):
         self.varnish_stats = json.loads(json_stats.stdout)
 
     def getValues(self,monitor):
-        for i in self.stats_munin[monitor]["values"].keys():
+        for i in self.aspects_munin[monitor]["values"].keys():
             if (monitor == "memory_usage"):
                 stats_key = "SMA."+str(i)
+                name = i.replace('.' , '_', 1) 
+                print('{0}.value {1}'.format(name, self.varnish_stats[stats_key]['value']))
             else:
                 stats_key = "MAIN."+str(i)
-            print('{0}.value {1}'.format(i, self.varnish_stats[stats_key]['value']))
+                print('{0}.value {1}'.format(i, self.varnish_stats[stats_key]['value']))
 
     def getConfig(self,monitor):
         print("graph_category Varnish")
-        print('graph_title {0}'.format(self.stats_munin[monitor]["title"]))
+        print('graph_title {0}'.format(self.aspects_munin[monitor]["title"]))
         graph_param = ["order","scale","vlabel","args"]
         for i in graph_param:
-            if i in self.stats_munin[monitor].keys():
-                print('graph_{0} {1}'.format(i, self.stats_munin[monitor][i]))
-        for i in self.stats_munin[monitor]["values"].keys():
+            if i in self.aspects_munin[monitor].keys():
+                print('graph_{0} {1}'.format(i, self.aspects_munin[monitor][i]))
+        for i in self.aspects_munin[monitor]["values"].keys():
             if (monitor == "memory_usage"):
                 stats_key = "SMA."+str(i)
+                name = i.replace('.' , '_', 1) 
+                print('{0}.label {1}'.format(name, self.varnish_stats[stats_key]['description']))
             else:
                 stats_key = "MAIN."+str(i)
-            print('{0}.label {1}'.format(i, self.varnish_stats[stats_key]['description']))
-            for k in self.stats_munin[monitor]["values"][i].keys():
-                print('{0}.{1} {2}'.format(i,k,self.stats_munin[monitor]["values"][i][k]))
+                print('{0}.label {1}'.format(i, self.varnish_stats[stats_key]['description']))
+            for k in self.aspects_munin[monitor]["values"][i].keys():
+                if (monitor == "memory_usage"):
+                    name=i.replace('.' , '_', 1)
+                    print('{0}.{1} {2}'.format(name,k,self.aspects_munin[monitor]["values"][i][k]))
+                else:
+                    print('{0}.{1} {2}'.format(i,k,self.aspects_munin[monitor]["values"][i][k]))
 
 if __name__ == '__main__':
     element = sys.argv[0].split("varnish_")
