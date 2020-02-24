@@ -32,9 +32,6 @@ class Monitor(object):
             if (monitor == "memory_usage"):
                 stats_key = "SMA."+str(i)
             else:
-                if (monitor == "memory_usage"):
-                stats_key = "SMA."+str(i)
-            else:
                 stats_key = "MAIN."+str(i)
             print('{0}.label {1}'.format(i, self.varnish_stats[stats_key]['description']))
             for k in self.stats_munin[monitor]["values"][i].keys():
