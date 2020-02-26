@@ -1,5 +1,6 @@
 # munin-varnish
 ## Munin varnish 6 plugin
+Using reference https://github.com/munin-monitoring/contrib/tree/master/plugins/varnish
 
 ```
 cd /etc/munin/plugins/
