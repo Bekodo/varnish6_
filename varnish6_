@@ -25,7 +25,6 @@ class Monitor(object):
         for i in graph_param:
             if i in self.aspects_munin[monitor].keys():
                 print('graph_{0} {1}'.format(i, self.aspects_munin[monitor][i]))
-        pprint(self.aspects_munin[monitor]["values"].keys())
         for j in self.aspects_munin[monitor]["values"].keys():
             stats_key = "MAIN."+str(j)
             print('{0}.label {1}'.format(j, self.varnish_stats[stats_key]['description']))
