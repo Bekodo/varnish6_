@@ -1,4 +1,4 @@
-varnish_aspect = {
+varnish_aspects = {
     'request_rate': {
         'values': {
             'backend_unhealthy': {
