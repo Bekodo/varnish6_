@@ -53,7 +53,7 @@ class Monitor(object):
             print(i)
 
 if __name__ == '__main__':
-    element = sys.argv[0].split("varnish_")
+    element = sys.argv[0].split("varnish6_")
     if element[1]:
         varnish = Monitor()
         if len(sys.argv) < 2:
