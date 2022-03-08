@@ -4,13 +4,13 @@ Using reference https://github.com/munin-monitoring/contrib/tree/master/plugins/
 
 ```
 cd /etc/munin/plugins/
-ln -s /usr/share/munin/plugins/varnish6_ varnish_backend_traffic
-ln -s /usr/share/munin/plugins/varnish6_ varnish_transfer_rates
-ln -s /usr/share/munin/plugins/varnish6_ varnish_request_rate
-ln -s /usr/share/munin/plugins/varnish6_ varnish_objects
-ln -s /usr/share/munin/plugins/varnish6_ varnish_uptime
-ln -s /usr/share/munin/plugins/varnish6_ varnish_threads
-ln -s /usr/share/munin/plugins/varnish6_ varnish_expunge
+ln -s /usr/share/munin/plugins/varnish6/varnish6_ varnish_backend_traffic
+ln -s /usr/share/munin/plugins/varnish6/varnish6_ varnish_transfer_rates
+ln -s /usr/share/munin/plugins/varnish6/varnish6_ varnish_request_rate
+ln -s /usr/share/munin/plugins/varnish6/varnish6_ varnish_objects
+ln -s /usr/share/munin/plugins/varnish6/varnish6_ varnish_uptime
+ln -s /usr/share/munin/plugins/varnish6/varnish6_ varnish_threads
+ln -s /usr/share/munin/plugins/varnish6/varnish6_ varnish_expunge
 ```
 or
 ```
