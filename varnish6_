@@ -28,6 +28,7 @@ class Monitor(object):
         varnishcommand=["varnishstat", "-j"]
         json_stats = subprocess.run(varnishcommand, stdout=subprocess.PIPE)
         self.varnish_stats = json.loads(json_stats.stdout)
+        self.varnish_stats = self.varnish_stats["counters"]
 
     def getValues(self,monitor):
         for i in self.aspects_munin[monitor]["values"].keys():
