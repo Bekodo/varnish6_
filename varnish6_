@@ -1,4 +1,4 @@
-#!/usr/bin/python3.6
+#!/usr/bin/env python3
 
 # Reference https://github.com/munin-monitoring/contrib/tree/master/plugins/varnish
 
@@ -16,54 +16,95 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import json, sys
+import json
+import os
 import subprocess
+import sys
 from aspects import varnish_aspects
+
+VARNISH_PREFIX = "varnish_"
+
+
+def _extract_counters(payload):
+    # varnishstat -j format v1 (Varnish < 6.5, e.g. 6.0 LTS): counters are
+    # top-level keys alongside "timestamp". Format v2 (>= 6.5) nests them
+    # under "counters" alongside "version"/"timestamp".
+    if "counters" in payload:
+        return payload["counters"]
+    return {k: v for k, v in payload.items() if k not in ("timestamp", "version")}
+
 
 class Monitor(object):
     aspects_munin = varnish_aspects
-    varnish_stats = {}
 
     def __init__(self):
-        varnishcommand=["varnishstat", "-j"]
-        json_stats = subprocess.run(varnishcommand, stdout=subprocess.PIPE)
-        self.varnish_stats = json.loads(json_stats.stdout)
-        self.varnish_stats = self.varnish_stats["counters"]
+        self.varnish_stats = {}
+        try:
+            result = subprocess.run(
+                ["varnishstat", "-j"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=True,
+            )
+        except (OSError, subprocess.CalledProcessError) as exc:
+            sys.exit("varnishstat failed: {0}".format(exc))
 
-    def getValues(self,monitor):
-        for i in self.aspects_munin[monitor]["values"].keys():
-            stats_key = "MAIN."+str(i)
-            print('{0}.value {1}'.format(i, self.varnish_stats[stats_key]['value']))
+        try:
+            self.varnish_stats = _extract_counters(json.loads(result.stdout))
+        except json.JSONDecodeError as exc:
+            sys.exit("could not parse varnishstat output: {0}".format(exc))
 
-    def getConfig(self,monitor):
+    def getValues(self, monitor):
+        for key in self.aspects_munin[monitor]["values"]:
+            stat = self.varnish_stats.get("MAIN." + key)
+            if stat is None:
+                continue
+            print('{0}.value {1}'.format(key, stat['value']))
+
+    def getConfig(self, monitor):
         print("graph_category Varnish")
         print('graph_title {0}'.format(self.aspects_munin[monitor]["title"]))
-        graph_param = ["order","scale","vlabel","args"]
-        for i in graph_param:
-            if i in self.aspects_munin[monitor].keys():
-                print('graph_{0} {1}'.format(i, self.aspects_munin[monitor][i]))
-        for j in self.aspects_munin[monitor]["values"].keys():
-            stats_key = "MAIN."+str(j)
-            print('{0}.label {1}'.format(j, self.varnish_stats[stats_key]['description']))
-            for k in self.aspects_munin[monitor]["values"][j].keys():
-                    print('{0}.{1} {2}'.format(j,k,self.aspects_munin[monitor]["values"][j][k]))
+        for param in ("order", "scale", "vlabel", "args"):
+            if param in self.aspects_munin[monitor]:
+                print('graph_{0} {1}'.format(param, self.aspects_munin[monitor][param]))
+        for key, opts in self.aspects_munin[monitor]["values"].items():
+            stat = self.varnish_stats.get("MAIN." + key)
+            label = stat['description'] if stat else key
+            print('{0}.label {1}'.format(key, label))
+            for opt_key, opt_val in opts.items():
+                print('{0}.{1} {2}'.format(key, opt_key, opt_val))
 
-    def getSuggest(self):
-        tomontor = ["backend_traffic","request_rate","transfer_rates","uptime","objects","threads","expunge"]
-        for i in tomontor:
-            print(i)
+    @classmethod
+    def getSuggest(cls):
+        for monitor in cls.aspects_munin:
+            print(monitor)
+
+
+def monitor_name(argv0):
+    basename = os.path.basename(argv0)
+    if basename.startswith(VARNISH_PREFIX):
+        return basename[len(VARNISH_PREFIX):]
+    return None
+
 
 if __name__ == '__main__':
-    element = sys.argv[0].split("varnish_")
-    if element[1]:
-        varnish = Monitor()
-        if len(sys.argv) < 2:
-            varnish.getValues(element[1])
-        elif sys.argv[1] == "config":
-            varnish.getConfig(element[1])
-        elif sys.argv[1] == "suggest":
-            varnish.getSuggest()
-        else:
-            print("Wrong Args")
+    if len(sys.argv) > 1 and sys.argv[1] == "suggest":
+        Monitor.getSuggest()
+        sys.exit(0)
+
+    name = monitor_name(sys.argv[0])
+    if name is None:
+        sys.exit(
+            "Link this script as '{0}<aspect>' (see suggest), "
+            "or run it directly with 'suggest'.".format(VARNISH_PREFIX)
+        )
+    if name not in Monitor.aspects_munin:
+        sys.exit("Unknown aspect '{0}'".format(name))
+
+    varnish = Monitor()
+    if len(sys.argv) < 2:
+        varnish.getValues(name)
+    elif sys.argv[1] == "config":
+        varnish.getConfig(name)
     else:
-        print('{0} suggest'.format(sys.argv[0]))
+        sys.exit("Wrong Args")
